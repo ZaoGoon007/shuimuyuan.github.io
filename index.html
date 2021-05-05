@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>枣子天气</title>
+</head>
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    a{
+        text-decoration: none;
+    }
+    ul li{
+        list-style-type: none;
+    }
+    .swpie{
+        width: 100%;
+        height: 15rem;
+    }
+    .swipe_item{
+        width: 100%;
+        height: 15rem;
+        position: absolute;
+        opacity: 0;
+        transition: all 0.8s;
+    }
+    .swipe_item img{
+        width: 100%;
+        height: 100%;
+    }
+    .swipe_item.active{
+        z-index: 10;
+        opacity: 1;
+    }
+    .gobtn{
+        position: absolute;
+        width: 4rem;
+        height: 5rem;
+        z-index: 20;
+        background: rgba(255,255,255,0.2);
+    }
+    .gobtn img{
+        width: 100%;
+        height: 100%;
+        opacity: 0.5;
+    }
+    #goPrebtn{
+        top: 4rem;
+    }
+    #goNextbtn{
+        right: 0;
+        top: 4rem;
+    }
+    .itme_ul{
+        position: absolute;
+        right: 1rem;
+    }
+    .itme_list{
+        float: left;
+        margin-left: 1rem;
+        position: relative;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 100%;
+        background: lightskyblue;
+        z-index: 20;
+        top: 13rem;
+        border-style: solid;
+        border-width: 2px;
+        border-color: blue;
+        opacity: 0.5;
+    }
+    .itme_list.active{
+        background: white;
+        opacity: 0.7;
+    }
+</style>
+<body>
+
+    <!--轮播图-->
+
+    <div class="swpie">
+        <div class="swipe_item active">
+            <img src="images/src=http___5b0988e595225.cdn.sohucs.com_images_20180720_ebd3f0bb96a14b56b5f782b05b5cee8f.jpg&refer=http___5b0988e595225.cdn.sohucs.jfif">
+        </div>
+        <div class="swipe_item">
+            <img src="images/src=http___img.yzt-tools.com_20201007_c2c74548447a0c8d151ec111cdc05525.jpg&refer=http___img.yzt-tools.jfif">
+        </div>
+        <div class="swipe_item">
+            <img src="images/src=http___n.sinaimg.cn_sinacn15_320_w640h480_20180926_4d41-hkmwytp2561300.jpg&refer=http___n.sinaimg.jfif">
+        </div>
+        <div class="swipe_item">
+            <img src="images/src=http___pic1.win4000.com_wallpaper_f_5091ea511057a.jpg&refer=http___pic1.win4000.jfif">
+        </div>
+        <div class="swipe_item">
+            <img src="images/src=http___wx2.sinaimg.cn_large_0089ONDlly4gq4yy5k4gnj30m80evjt4.jpg&refer=http___wx2.sinaimg.jfif">
+        </div>
+        <!--点击轮播-->
+        <div class="gobtn" id="goPrebtn">
+            <img src="images/gopre.png">
+        </div>
+        <div class="gobtn" id="goNextbtn">
+            <img src="images/gonext.png">
+        </div>
+
+        <ul class="itme_ul">
+            <li class="itme_list active" data-index = "0"></li>
+            <li class="itme_list" data-index = "1"></li>
+            <li class="itme_list" data-index = "2"></li>
+            <li class="itme_list" data-index = "3"></li>
+            <li class="itme_list" data-index = "4"></li>
+        </ul>
+
+        <p id="city" style="position: absolute;top: 20rem;font-size: 5rem;"></p>
+    </div>
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    var items = document.getElementsByClassName("swipe_item");
+    var itme_list = document.getElementsByClassName("itme_list");
+    var goPre = document.getElementById("goPrebtn");
+    var goNext = document.getElementById("goNextbtn");
+    var Index = 0;// 显示的第几张图片
+    var time = 0;//计时器
+
+    // 清除所有active
+    function clearActive(){
+        for (var i = 0;i < items.length;i++ ){
+            items[i].className = "swipe_item";
+        }
+        for (var i = 0;i < itme_list.length;i++ ){
+            itme_list[i].className = "itme_list";
+        }
+    }
+
+    // 执行轮播
+    function  goIndex(){
+        clearActive();
+        items[Index].className = "swipe_item active";
+        itme_list[Index].className = "itme_list active";
+    }
+
+    // 执行下一张
+    function goNextindex(){
+        if (Index < 4){
+            Index++;
+        }else{
+            Index = 0;
+        }
+        goIndex()
+    }
+
+    // 执行上一张
+    function goPreindex(){
+        if (Index == 0){
+            Index = 4;
+        }else{
+            Index--;
+        }
+        goIndex()
+    }
+
+    // 点击执行下一张
+    goNext.addEventListener("click", function (){
+        goNextindex();
+    })
+    // 点击执行上一张
+    goPre.addEventListener("click", function (){
+        goPreindex();
+    })
+
+    // 点击圆点轮播
+    for (var i = 0;i < itme_list.length;i++){
+        itme_list[i].addEventListener("click", function (){
+            var itemindex = this.getAttribute("data-index");
+            Index = itemindex;
+            goIndex();
+            time = 0;
+        })
+    }
+
+    // 轮播图定时器
+    setInterval(function (){
+        time++;
+        if(time == 20){
+            goNextindex();
+            time = 0;
+        }
+    }, 100)
+
+
+    if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(onSuccess);
+    }else {
+        alert("您的浏览器不支持使用HTML 5来获取地理位置服务");
+    }
+
+    // 获取经纬度
+
+        //定位数据获取成功响应
+    function  onSuccess(position) {
+        position.coords.latitude;
+        position.coords.longitude;
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+        axios
+            .get('https://route.showapi.com/9-5?showapi_appid=623680&showapi_sign=68bb58fa29be4fa59a06a089a8381925&lng='+ longitude +'&lat='+ latitude +'&from=5',{
+                params: {
+                    // lng:lng,
+                    // lat:lat
+                }
+            })
+            .then(res => {
+
+                console.log('数据是:', res.data.showapi_res_body.cityInfo.c5);
+                document.getElementById("city").innerHTML = res.data.showapi_res_body.cityInfo.c5;
+            })
+            .catch((e) => {
+                console.log('获取数据失败');
+            });
+
+    }
+
+
+
+
+
+</script>
+</html>
