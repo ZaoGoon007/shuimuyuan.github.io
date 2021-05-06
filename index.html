@@ -12,6 +12,9 @@
         margin: 0;
         padding: 0;
     }
+    body{
+        background: url("images/background.jfif");
+    }
     a{
         text-decoration: none;
     }
@@ -79,6 +82,29 @@
         background: white;
         opacity: 0.7;
     }
+    .cityinfo{
+        position: relative;
+        top: 16rem;
+        width: 95%;
+        margin: 0 auto;
+    }
+    .cityinfo p{
+        font-size: 2rem;
+        color: white;
+        float: left;
+    }
+    .weatherinfo{
+        width: 95%;
+        margin: 0 auto;
+        font-size: 1.5rem;
+        color: white;
+        margin-top: 2rem;
+    }
+    .weatherinfo span{
+        float: left;
+        margin-top: 1rem;
+    }
+
 </style>
 <body>
 
@@ -116,7 +142,38 @@
             <li class="itme_list" data-index = "4"></li>
         </ul>
 
-        <p id="city" style="position: absolute;top: 20rem;font-size: 5rem;"></p>
+        <div class="cityinfo">
+            <img src="images/dw.png" style="height: 2rem;float: left">
+            <p id="province" style="font-size: 1.5rem;font-weight: bold;"></p>
+            <div style="clear: both"></div>
+            <p id="city"></p>
+            <p id="district" style="margin-left: 2%"></p>
+            <p id="weather" style="float: right"></p>
+        </div>
+        <p id="now_wd" style="font-size: 7rem;color: white;margin-top: 20rem;max-width: 10rem;float: left;margin-left: 35%"></p>
+        <span style="color: white;font-size: 2rem;float: left;margin-top: 21rem;">℃</span>
+        <div style="clear: both"></div>
+
+        <p id="td_wd" style="font-size: 1.5rem;color: white;text-align: center;width: 10rem;margin: 0 auto">25℃ / 15℃</p>
+        <div style="clear: both"></div>
+
+        <div class="weatherinfo">
+
+            <span id="today">5月5日</span><span>今天</span>
+            <span id="today_weather" style="margin-left: 12%">晴</span>
+            <span id="today_wd" style="float: right">25℃ / 15℃</span>
+
+            <hr style="width: 98.5%;margin: 0 auto;height: 1px;background: white;opacity: 0.5;margin-top: 1rem">
+            <span id="tomorrow">5月5日</span><span>明天</span>
+            <span id="tomorrow_weather" style="margin-left: 12%">晴</span>
+            <span id="tomorrow_wd" style="float: right">25℃ / 15℃</span>
+
+            <hr style="width: 98.5%;margin: 0 auto;height: 1px;background: white;opacity: 0.5;margin-top: 1rem">
+            <span id="TDAT">5月5日</span><span>后天</span>
+            <span id="TDAT_weather" style="margin-left: 12%">晴</span>
+            <span id="TDAT_wd" style="float: right">25℃ / 15℃</span>
+        </div>
+
     </div>
 </body>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -216,9 +273,72 @@
                 }
             })
             .then(res => {
+                var data = res.data.showapi_res_body;
+                console.log('数据是:', res.data.showapi_res_body);
+                document.getElementById("province").innerHTML = data.cityInfo.c7;
+                document.getElementById("city").innerHTML = data.cityInfo.c5;
+                document.getElementById("district").innerHTML = data.cityInfo.c3;
+                document.getElementById("now_wd").innerHTML = data.now.temperature;
+                document.getElementById("weather").innerHTML = data.now.weather;
 
-                console.log('数据是:', res.data.showapi_res_body.cityInfo.c5);
-                document.getElementById("city").innerHTML = res.data.showapi_res_body.cityInfo.c5;
+                // 今天天气
+                var m = data.f1.day.substr(4,4);
+                if(m[0] === '0' && m[2] === '0'){
+                    document.getElementById("today").innerHTML = m[1] + "月" + m[3] +"日";
+                }else if(m[0] === '0' && m[2] !== '0'){
+                    document.getElementById("today").innerHTML = m[1] + "月"+ m[2] + m[3] +"日";
+                }else if(m[0] !== '0' && m[2] === '0'){
+                    document.getElementById("today").innerHTML = m[0] + m[1] + "月" + m[3] +"日";
+                }else{
+                    document.getElementById("today").innerHTML = m[0] + m[1] + "月"+ m[2] + m[3] +"日";
+                }
+                document.getElementById("today_weather").innerHTML = data.f1.day_weather;
+
+                var today_zgwd = data.f1.day_air_temperature;
+                var today_zdwd = data.f1.night_air_temperature;
+                let today_wc = today_zgwd + "℃ / " + today_zdwd + "℃";
+                document.getElementById("today_wd").innerHTML = today_wc;
+                document.getElementById("td_wd").innerHTML = today_wc;
+
+                // 明天天气
+                var m1 = data.f2.day.substr(4,4);
+                if(m1[0] === '0' && m1[2] === '0'){
+                    document.getElementById("tomorrow").innerHTML = m1[1] + "月" + m1[3] +"日";
+                }else if(m1[0] === '0' && m1[2] !== '0'){
+                    document.getElementById("tomorrow").innerHTML = m1[1] + "月"+ m1[2] + m1[3] +"日";
+                }else if(m1[0] !== '0' && m1[2] === '0'){
+                    document.getElementById("tomorrow").innerHTML = m1[0] + m1[1] + "月" + m1[3] +"日";
+                }else{
+                    document.getElementById("tomorrow").innerHTML = m1[0] + m1[1] + "月"+ m1[2] + m1[3] +"日";
+                }
+                document.getElementById("tomorrow_weather").innerHTML = data.f2.day_weather;
+
+                var tomorrow_zgwd = data.f2.day_air_temperature;
+                var tomorrow_zdwd = data.f2.night_air_temperature;
+                let tomorrow_wc = tomorrow_zgwd + "℃ / " + tomorrow_zdwd + "℃";
+                document.getElementById("tomorrow_wd").innerHTML = tomorrow_wc;
+                document.getElementById("td_wd").innerHTML = tomorrow_wc;
+
+                // 后台天气
+                var m2 = data.f3.day.substr(4,4);
+                if(m2[0] === '0' && m2[2] === '0'){
+                    document.getElementById("TDAT").innerHTML = m2[1] + "月" + m2[3] +"日";
+                }else if(m2[0] === '0' && m2[2] !== '0'){
+                    document.getElementById("TDAT").innerHTML = m2[1] + "月"+ m2[2] + m2[3] +"日";
+                }else if(m2[0] !== '0' && m2[2] === '0'){
+                    document.getElementById("TDAT").innerHTML = m2[0] + m2[1] + "月" + m2[3] +"日";
+                }else{
+                    document.getElementById("TDAT").innerHTML = m2[0] + m2[1] + "月"+ m2[2] + m2[3] +"日";
+                }
+                document.getElementById("TDAT_weather").innerHTML = data.f3.day_weather;
+
+                var TDAT_zgwd = data.f3.day_air_temperature;
+                var TDAT_zdwd = data.f3.night_air_temperature;
+                let TDAT_wc = TDAT_zgwd + "℃ / " + TDAT_zdwd + "℃";
+                document.getElementById("TDAT_wd").innerHTML = TDAT_wc;
+                document.getElementById("td_wd").innerHTML = TDAT_wc;
+
+
             })
             .catch((e) => {
                 console.log('获取数据失败');
